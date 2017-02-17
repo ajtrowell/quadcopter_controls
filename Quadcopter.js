@@ -36,11 +36,15 @@ Quadcopter.prototype.update = function(){
 
     // Update velocity from acceleration
     // Convert timestep based on physics.framesPerSimSecond.
+    // Add (acceleration vector * timeStep_seconds) to existing velocity vector.
+    this.velocity_mps.add( this.acceleration_mpss.copy().div( physics.framesPerSimSecond ));
 
     // Update position from velocity.
     // Take note of physics.pixelsPerMeter
     // Convert timestep based on physics.framesPerSimSecond.
-    // ??? is this.position_pixels meant to be in pixels or in meters?
+    // this.position_pixels is in pixels, not meters.
+    var delta_position_meters = this.velocity_mps.copy().div( physics.framesPerSimSecond );
+    this.position_pixels.add(delta_position_meters.copy().mult(  physics.pixelsPerMeter ));
     
 
     
