@@ -18,6 +18,13 @@ function Quadcopter(){
     this.autoPilotThrust_newtons = createVector(0,0); // Calculated thrust command.
     this.autoPilotTarget_pixels = createVector(width/2,height/2); // Initial target position.
     this.drawTarget = true; // Draws axes through autopilot target position.
+
+    // Control System Command Components
+    // Primarily useful for creating plots, since they are summed to 
+    // produce the this.autoPilotThrust_newtons value.
+    this.proportional_thrust = createVector(0,0);
+    this.integral_thrust = createVector(0,0);
+    this.differential_thrust = createVector(0,0);
     
 }//constructor
 Quadcopter.prototype.draw = function(){
@@ -99,6 +106,23 @@ Quadcopter.prototype.boundThrust = function(thrustVector){
         return output;
     } // end inner function
 }// boundThrust()
+Quadcopter.prototype.toggleAutopilot = function() {
+    this.autoPilotActive = !this.autoPilotActive; // Toggle autopilot.
+    if(this.autoPilotActive) { // If just turned on:
+        this.resetAutopilot();
+    } else { // Just turned off:
+        this.thrust_newtons = createVector(0,0); // Clear entry from autopilot.
+    }
+}// toggleAutopilot()
+Quadcopter.prototype.resetAutopilot = function() {
+    // Reset autopilot memory components.
+    // Primarily to clear integral component after 
+    // restarting the autopilot.
+    this.autoPilotThrust_newtons = createVector(0,0);
+    this.proportional_thrust = createVector(0,0);
+    this.integral_thrust = createVector(0,0);
+    this.differential_thrust = createVector(0,0);
+}// resetAutopilot()
 Quadcopter.prototype.autoPilot = function(targetPositionVector){
     // Calculate thrust commands to maintain target position.
     // If argument is provided, update target location.
@@ -106,11 +130,30 @@ Quadcopter.prototype.autoPilot = function(targetPositionVector){
         this.autoPilotTarget_pixels = targetPositionVector.copy();
     }
 
+    // Thrust components. Clear all.
+    this.autoPilotThrust_newtons = createVector(0,0);
+    // this.proportional_thrust = createVector(0,0);
+    // this.integral_thrust = createVector(0,0);
+    // this.differential_thrust = createVector(0,0);
+
     // Setup PID controller
     // Error Signal calculation:
     this.autoPilotError_pixels = this.autoPilotTarget_pixels.copy().sub(this.position_pixels);
     this.K = 10; // System Gain, applied to Proportional, Integral, and Differential.
+    this.Tau_i = .1; // Integral component time constant.
+    this.Tau_d = .1; // Differential component time constant.
+
+    // Implement vertical autopilot only
+    // Proportional component 
+    this.proportional_thrust.y = this.autoPilotError_pixels.y * this.K;
+
+    // Integral Component
+    // this.integral_thrust.y = this.integral_thrust.y
+
+    // Sum components of P.I.D.
+    this.autoPilotThrust_newtons.y = 
+          this.proportional_thrust.y
+        + this.integral_thrust.y
+        + this.differential_thrust.y;
     
-    // Implement vertical autopilot only 
-    this.autoPilotThrust_newtons.y = this.autoPilotError_pixels.y * this.K;
 }

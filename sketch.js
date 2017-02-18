@@ -43,7 +43,7 @@ physics = {
 function keyPressed() {
   if(key == ' ') {
     // Toggle autoPilot
-    quad1.autoPilotActive = !quad1.autoPilotActive;
+    quad1.toggleAutopilot();
   }
   if(keyCode === LEFT_ARROW)  { quad1.thrust_newtons.x = -quad1.maxThrust_newtons; } 
   if(keyCode === RIGHT_ARROW) { quad1.thrust_newtons.x =  quad1.maxThrust_newtons; }
@@ -52,8 +52,7 @@ function keyPressed() {
 }
 function keyReleased() {
   if(key == ' ') {
-    // Clear previous thrust so last autopilot command won't persist.
-    quad1.thrust_newtons = createVector(0,0);
+    // optional command on release
   }
   if(keyCode === LEFT_ARROW)  {  quad1.thrust_newtons.x = 0; } 
   if(keyCode === RIGHT_ARROW) {  quad1.thrust_newtons.x = 0; }
