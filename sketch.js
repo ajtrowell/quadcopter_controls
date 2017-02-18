@@ -14,6 +14,7 @@ function draw() {
 }
 
 
+// Define physics object
 physics = {
     gravity_mps: 10, // meters/sec^2
     pixelsPerMeter: 10,
@@ -37,3 +38,23 @@ physics = {
 } //physics object
 
 
+
+// Keyboard Inputs
+function keyPressed() {
+  if(key == ' ') {
+    //action key on
+  }
+  if(keyCode === LEFT_ARROW)  { quad1.thrust_newtons.x = -quad1.maxThrust_newtons; } 
+  if(keyCode === RIGHT_ARROW) { quad1.thrust_newtons.x =  quad1.maxThrust_newtons; }
+  if(keyCode === UP_ARROW)    { quad1.thrust_newtons.y = -quad1.maxThrust_newtons; }
+  if(keyCode === DOWN_ARROW)  { quad1.thrust_newtons.y =  quad1.maxThrust_newtons; }
+}
+function keyReleased() {
+  if(key == ' ') {
+    //action key off
+  }
+  if(keyCode === LEFT_ARROW)  {  quad1.thrust_newtons.x = 0; } 
+  if(keyCode === RIGHT_ARROW) {  quad1.thrust_newtons.x = 0; }
+  if(keyCode === UP_ARROW)    {  quad1.thrust_newtons.y = 0; }
+  if(keyCode === DOWN_ARROW)  {  quad1.thrust_newtons.y = 0; }
+}
