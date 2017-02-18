@@ -59,3 +59,11 @@ function keyReleased() {
   if(keyCode === UP_ARROW)    {  quad1.thrust_newtons.y = 0; }
   if(keyCode === DOWN_ARROW)  {  quad1.thrust_newtons.y = 0; }
 }
+
+// Mouse Inputs
+function mouseClicked() {
+    // Click to set autopilot target.
+    quad1.autopilot(createVector(mouseX,mouseY));
+    // prevent default
+    return false;
+}
