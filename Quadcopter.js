@@ -25,6 +25,7 @@ function Quadcopter(){
     this.proportional_thrust = createVector(0,0);
     this.integral_thrust = createVector(0,0);
     this.differential_thrust = createVector(0,0);
+    this.lastPosition_pixels = this.position_pixels.copy(); // 0 initial differential position.
     
 }//constructor
 Quadcopter.prototype.draw = function(){
@@ -122,6 +123,7 @@ Quadcopter.prototype.resetAutopilot = function() {
     this.proportional_thrust = createVector(0,0);
     this.integral_thrust = createVector(0,0);
     this.differential_thrust = createVector(0,0);
+    this.lastPosition_pixels = this.position_pixels.copy();
 }// resetAutopilot()
 Quadcopter.prototype.autopilot = function(targetPositionVector){
     // Calculate thrust commands to maintain target position.
@@ -140,15 +142,25 @@ Quadcopter.prototype.autopilot = function(targetPositionVector){
     // Error Signal calculation:
     this.autopilotError_pixels = this.autopilotTarget_pixels.copy().sub(this.position_pixels);
     this.K = 10; // System Gain, applied to Proportional, Integral, and Differential.
-    this.Tau_i = .1; // Integral component time constant.
-    this.Tau_d = .1; // Differential component time constant.
+    this.Tau_i = 30; // Integral component time constant. (SecondsPerRepeat)
+    this.Tau_d = .001; // Differential component time constant.
 
     // Implement vertical autopilot only
     // Proportional component 
     this.proportional_thrust.y = this.autopilotError_pixels.y * this.K;
 
     // Integral Component
-    // this.integral_thrust.y = this.integral_thrust.y
+    // Note Tau_i * fps := secondsPerRepeat * framesPerSimSecond
+    // = frames per repeat.
+    this.integral_thrust.y = this.integral_thrust.y + 
+            (this.K / (this.Tau_i * physics.framesPerSimSecond)) 
+            * this.autopilotError_pixels.y;
+
+    // Differential Component
+    this.differential_thrust.y = 
+            (this.K / (this.Tau_d * physics.framesPerSimSecond)) 
+            * -(this.position_pixels.y - this.lastPosition_pixels.y);
+            
 
     // Sum components of P.I.D.
     this.autopilotThrust_newtons.y = 
@@ -156,4 +168,6 @@ Quadcopter.prototype.autopilot = function(targetPositionVector){
         + this.integral_thrust.y
         + this.differential_thrust.y;
     
+    // Store "previous position" for next differential iteration.
+    this.lastPosition_pixels = this.position_pixels.copy();
 }
