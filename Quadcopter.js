@@ -81,15 +81,17 @@ Quadcopter.prototype.thrust = function(thrustVector){
 Quadcopter.prototype.boundThrust = function(thrustVector){
     // Clip input thrust vector to within +/- this.maxThrust_newtons
     var outputThrustVector = thrustVector.copy();
-    outputThrustVector.x = clipToRange(outputThrustVector.x,-this.maxThrust_newtons,this.maxThrust_newtons);
-    outputThrustVector.y = clipToRange(outputThrustVector.y,-this.maxThrust_newtons,this.maxThrust_newtons);
+    var that = this; // local value for inner function.
+    
+    outputThrustVector.x = clipToRange(outputThrustVector.x);
+    outputThrustVector.y = clipToRange(outputThrustVector.y);
     return outputThrustVector;
 
     // Inner function 
     function clipToRange(input,min,max) {
         // this. vs quad1. ?  How to access this from inner function? IDK.
-        min = ((min === undefined) ? -quad1.maxThrust_newtons : min); // Set default value
-        max = ((max === undefined) ?  quad1.maxThrust_newtons : max); // Set default value
+        min = ((min === undefined) ? -that.maxThrust_newtons : min); // Set default value
+        max = ((max === undefined) ?  that.maxThrust_newtons : max); // Set default value
         var output;
         if (input>max) { output = max; } 
         else if (input<min) { output = min; } 
