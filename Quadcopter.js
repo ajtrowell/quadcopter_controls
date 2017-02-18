@@ -142,7 +142,7 @@ Quadcopter.prototype.autopilot = function(targetPositionVector){
     // Error Signal calculation:
     this.autopilotError_pixels = this.autopilotTarget_pixels.copy().sub(this.position_pixels);
     this.K = 10; // System Gain, applied to Proportional, Integral, and Differential.
-    this.Tau_i = 30; // Integral component time constant. (SecondsPerRepeat)
+    this.Tau_i = 10; // Integral component time constant. (SecondsPerRepeat)
     this.Tau_d = .001; // Differential component time constant.
 
     // Implement vertical autopilot only
