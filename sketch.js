@@ -42,7 +42,7 @@ physics = {
 // Keyboard Inputs
 function keyPressed() {
   if(key == ' ') {
-    // Toggle autoPilot
+    // Toggle autopilot
     quad1.toggleAutopilot();
   }
   if(keyCode === LEFT_ARROW)  { quad1.thrust_newtons.x = -quad1.maxThrust_newtons; } 
