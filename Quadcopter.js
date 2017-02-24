@@ -19,6 +19,11 @@ function Quadcopter(){
     this.autopilotTarget_pixels = createVector(width/2,height/2); // Initial target position.
     this.drawTarget = true; // Draws axes through autopilot target position.
 
+    // Setup PID objects.
+    // (K, Tau_i, Tau_d, integration_time_sec)
+    this.pid_x = new PID(20, 4, .0003, -1);
+    this.pid_y = new PID(20, 4, .0003, -1);
+
     // Control System Command Components
     // Primarily useful for creating plots, since they are summed to 
     // produce the this.autopilotThrust_newtons value.
@@ -125,7 +130,28 @@ Quadcopter.prototype.resetAutopilot = function() {
     this.differential_thrust = createVector(0,0);
     this.lastPosition_pixels = this.position_pixels.copy();
 }// resetAutopilot()
-Quadcopter.prototype.autopilot = function(targetPositionVector){
+Quadcopter.prototype.autopilot = function(targetPositionVector) {
+    
+    if(targetPositionVector) {
+        this.autopilotTarget_pixels = targetPositionVector.copy();
+    }
+    
+    // Thrust components. Clear all.
+    this.autopilotThrust_newtons = createVector(0,0);
+    
+    // Error Signal calculation:
+    this.autopilotError_pixels = this.autopilotTarget_pixels.copy().sub(this.position_pixels);
+    
+    // PID update
+    var time = physics.getTime();
+    this.pid_x.update(this.autopilotError_pixels.x,time);
+    this.pid_y.update(this.autopilotError_pixels.y,time);
+
+    // PID output
+    this.autopilotThrust_newtons = createVector(this.pid_x.output,this.pid_y.output);
+    
+}
+Quadcopter.prototype.autopilot2 = function(targetPositionVector){
     // Calculate thrust commands to maintain target position.
     // If argument is provided, update target location.
     if(targetPositionVector) {
