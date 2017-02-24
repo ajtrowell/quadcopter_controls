@@ -147,7 +147,7 @@ Quadcopter.prototype.autopilot = function(targetPositionVector){
 
     // Implement vertical autopilot only
     // Proportional component 
-    this.proportional_thrust.y = this.autopilotError_pixels.y * this.K;
+    this.proportional_thrust.y = powerSign(this.autopilotError_pixels.y,1) * this.K;
 
     // Integral Component
     // Note Tau_i * fps := secondsPerRepeat * framesPerSimSecond
@@ -170,4 +170,11 @@ Quadcopter.prototype.autopilot = function(targetPositionVector){
     
     // Store "previous position" for next differential iteration.
     this.lastPosition_pixels = this.position_pixels.copy();
+}
+
+powerSign = function(base,exponent) {
+    // returns power, but permits negative base.
+    var magnitude = Math.pow(Math.abs(base),exponent);
+    var sign = base / Math.abs(base);
+    return sign * magnitude;
 }
