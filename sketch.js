@@ -3,11 +3,11 @@ var physics;
 
 function setup() {
     createCanvas(windowWidth,windowHeight);
+    physics.setFPS();
     quad1 = new Quadcopter();
 }
 
 function draw() {
-    physics.setTimeScale(); // Update based on current fps.
     background(0);
     quad1.update();
     quad1.draw();
@@ -18,14 +18,12 @@ function draw() {
 physics = {
     gravity_mps: 10, // meters/sec^2
     pixelsPerMeter: 10,
-    framesPerSimSecond: 30,  // Initial value.
+    framesPerSimSecond: 60,  // Initial value.
     timeScale : 1, // Larger runs faster.
 
     setTimeScale : function() {
         // Update timescale as FPS changes.
         // Prevent having a arbitrarily small timescale.
-        // Note: this function should probably be a member of the 
-        // physics object.
         var tempFPS = getFrameRate();
         var minFPS = 10;
         
@@ -34,7 +32,15 @@ physics = {
         } else {
             this.framesPerSimSecond = minFPS;
         }
-    }//setPhysicsTimeScale()
+    },//setPhysicsTimeScale()
+
+    setFPS : function() {
+        frameRate(this.framesPerSimSecond);
+    },
+
+    getTime : function() {
+        return frameCount * this.framesPerSimSecond;
+    }
 } //physics object
 
 
