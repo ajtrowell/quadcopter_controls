@@ -69,7 +69,9 @@ Quadcopter.prototype.update = function(){
     // Update netForce from gravity and thrust
     // Create gravityVector with units of Newtons:
     var gravityVector = createVector(0,this.mass_kg * physics.gravity_mps);
-    this.netForce_newtons = p5.Vector.add(this.thrust_newtons,gravityVector);
+    this.netForce_newtons = p5.Vector.add( 
+        this.boundThrust(this.thrust_newtons), gravityVector);
+    
     // Update acceleration from netForce and mass
     //  acceleration  = force(Newtons) / mass(Kilograms)
     this.acceleration_mpss = this.netForce_newtons.copy().div(this.mass_kg);
@@ -148,7 +150,7 @@ Quadcopter.prototype.autopilot = function(targetPositionVector) {
     this.pid_y.update(this.autopilotError_pixels.y,time);
 
     // PID output
-    this.autopilotThrust_newtons = createVector(this.pid_x.output,this.pid_y.output);
+    this.autopilotThrust_newtons = createVector(-this.pid_x.output,-this.pid_y.output);
     
 }
 Quadcopter.prototype.autopilot2 = function(targetPositionVector){

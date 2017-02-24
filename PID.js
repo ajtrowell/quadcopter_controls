@@ -77,7 +77,7 @@ PID.prototype.update = function(newPosition,newTime) {
             // this.positionVector.add(newPosition);
             // this.timeVector.add(newTime);
             this.position = newPosition;
-            this.time = newPosition;
+            this.time = newTime;
         }
     }
 

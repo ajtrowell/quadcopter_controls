@@ -39,7 +39,7 @@ physics = {
     },
 
     getTime : function() {
-        return frameCount * this.framesPerSimSecond;
+        return frameCount / this.framesPerSimSecond;
     }
 } //physics object
 
