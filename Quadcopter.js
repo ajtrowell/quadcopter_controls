@@ -138,6 +138,11 @@ Quadcopter.prototype.autopilot = function(targetPositionVector) {
         this.autopilotTarget_pixels = targetPositionVector.copy();
     }
     
+    // Update PID targets. 
+    this.pid_x.setTarget(this.autopilotTarget_pixels.x);
+    this.pid_y.setTarget(this.autopilotTarget_pixels.y);
+    
+    
     // Thrust components. Clear all.
     this.autopilotThrust_newtons = createVector(0,0);
     
@@ -146,11 +151,11 @@ Quadcopter.prototype.autopilot = function(targetPositionVector) {
     
     // PID update
     var time = physics.getTime();
-    this.pid_x.update(this.autopilotError_pixels.x,time);
-    this.pid_y.update(this.autopilotError_pixels.y,time);
+    this.pid_x.update(this.position_pixels.x,time);
+    this.pid_y.update(this.position_pixels.y,time);
 
     // PID output
-    this.autopilotThrust_newtons = createVector(-this.pid_x.output,-this.pid_y.output);
+    this.autopilotThrust_newtons = createVector(this.pid_x.output,this.pid_y.output);
     
 }
 Quadcopter.prototype.autopilot2 = function(targetPositionVector){
