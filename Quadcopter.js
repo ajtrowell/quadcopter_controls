@@ -23,14 +23,6 @@ function Quadcopter(){
     // (K, Tau_i, Tau_d, integration_time_sec)
     this.pid_x = new PID(20, 4, .0003, -1);
     this.pid_y = new PID(20, 4, .0003, -1);
-
-    // Control System Command Components
-    // Primarily useful for creating plots, since they are summed to 
-    // produce the this.autopilotThrust_newtons value.
-    this.proportional_thrust = createVector(0,0);
-    this.integral_thrust = createVector(0,0);
-    this.differential_thrust = createVector(0,0);
-    this.lastPosition_pixels = this.position_pixels.copy(); // 0 initial differential position.
     
 }//constructor
 Quadcopter.prototype.draw = function(){
@@ -126,28 +118,17 @@ Quadcopter.prototype.resetAutopilot = function() {
     // Reset autopilot memory components.
     // Primarily to clear integral component after 
     // restarting the autopilot.
-    this.autopilotThrust_newtons = createVector(0,0);
-    this.proportional_thrust = createVector(0,0);
-    this.integral_thrust = createVector(0,0);
-    this.differential_thrust = createVector(0,0);
-    this.lastPosition_pixels = this.position_pixels.copy();
+    this.pid_x.reset();
+    this.pid_y.reset();
 }// resetAutopilot()
 Quadcopter.prototype.autopilot = function(targetPositionVector) {
     
     if(targetPositionVector) {
         this.autopilotTarget_pixels = targetPositionVector.copy();
     }
-    
     // Update PID targets. 
     this.pid_x.setTarget(this.autopilotTarget_pixels.x);
     this.pid_y.setTarget(this.autopilotTarget_pixels.y);
-    
-    
-    // Thrust components. Clear all.
-    this.autopilotThrust_newtons = createVector(0,0);
-    
-    // Error Signal calculation:
-    this.autopilotError_pixels = this.autopilotTarget_pixels.copy().sub(this.position_pixels);
     
     // PID update
     var time = physics.getTime();
@@ -157,57 +138,4 @@ Quadcopter.prototype.autopilot = function(targetPositionVector) {
     // PID output
     this.autopilotThrust_newtons = createVector(this.pid_x.output,this.pid_y.output);
     
-}
-Quadcopter.prototype.autopilot2 = function(targetPositionVector){
-    // Calculate thrust commands to maintain target position.
-    // If argument is provided, update target location.
-    if(targetPositionVector) {
-        this.autopilotTarget_pixels = targetPositionVector.copy();
-    }
-
-    // Thrust components. Clear all.
-    this.autopilotThrust_newtons = createVector(0,0);
-    // this.proportional_thrust = createVector(0,0);
-    // this.integral_thrust = createVector(0,0);
-    // this.differential_thrust = createVector(0,0);
-
-    // Setup PID controller
-    // Error Signal calculation:
-    this.autopilotError_pixels = this.autopilotTarget_pixels.copy().sub(this.position_pixels);
-    this.K = 20; // System Gain, applied to Proportional, Integral, and Differential.
-    this.Tau_i = 4; // Integral component time constant. (SecondsPerRepeat)
-    this.Tau_d = .0003; // Differential component time constant.
-
-    // Implement vertical autopilot only
-    // Proportional component 
-    this.proportional_thrust.y = powerSign(this.autopilotError_pixels.y,1) * this.K;
-
-    // Integral Component
-    // Note Tau_i * fps := secondsPerRepeat * framesPerSimSecond
-    // = frames per repeat.
-    this.integral_thrust.y = this.integral_thrust.y + 
-            (this.K / (this.Tau_i * physics.framesPerSimSecond)) 
-            * this.autopilotError_pixels.y;
-
-    // Differential Component
-    this.differential_thrust.y = 
-            (this.K / (this.Tau_d * physics.framesPerSimSecond)) 
-            * -(this.position_pixels.y - this.lastPosition_pixels.y);
-            
-
-    // Sum components of P.I.D.
-    this.autopilotThrust_newtons.y = 
-          this.proportional_thrust.y
-        + this.integral_thrust.y
-        + this.differential_thrust.y;
-    
-    // Store "previous position" for next differential iteration.
-    this.lastPosition_pixels = this.position_pixels.copy();
-}
-
-powerSign = function(base,exponent) {
-    // returns power, but permits negative base.
-    var magnitude = Math.pow(Math.abs(base),exponent);
-    var sign = base / Math.abs(base);
-    return sign * magnitude;
 }
