@@ -50,11 +50,12 @@ PID.prototype.reset = function() {
     this.output_proportional = 0;
     this.output_integral = 0;
     this.output_differential = 0;
+    // Integral and Differential history clear
+    this.last_position = this.position;
+    this.last_time = this.time;
 }// reset()
 PID.prototype.setTarget = function(newTarget) {
-    // Change target or 'set point' of the controller.
-    // This clears the integrator memory.
-    this.reset();
+    // Input new controller setpoint.
     this.target = newTarget;
 }// setTarget()
 PID.prototype.getError = function() {
@@ -76,6 +77,12 @@ PID.prototype.update = function(newPosition,newTime) {
         if(newTime !== undefined) {
             // this.positionVector.add(newPosition);
             // this.timeVector.add(newTime);
+
+            // Store last position/time for next differential iteration.
+            this.last_time = this.time;
+            this.last_position = this.position;
+
+            // Update current position. 
             this.position = newPosition;
             this.time = newTime;
         }
@@ -101,10 +108,6 @@ PID.prototype.update = function(newPosition,newTime) {
           this.output_proportional
         + this.output_integral
         + this.output_differential;
-    
-    // Store last position/time for next differential iteration.
-    this.last_position = this.position;
-    this.last_time = this.time;
 
     return this.output;
     
