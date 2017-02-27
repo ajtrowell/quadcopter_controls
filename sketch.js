@@ -1,14 +1,42 @@
 var quad1; // Quadcopter object instance.
 var physics;
 
+var world;
+
+function world()
+{
+    this.quad_copters = [];
+}
+
+
+
+
+
+
 function setup() {
     createCanvas(windowWidth,windowHeight);
     physics.setFPS();
     quad1 = new Quadcopter();
+    var prop1 = new Propsulion(quad1);
+}
+
+function Propulsion(body)
+{
+    this.body = body;
+
+    this.update = function()
+    {
+        body.force += calculated_force;
+    }
+
 }
 
 function draw() {
     background(0);
+    gravity.applyForce(quad1);
+    quad1.netForces += gravity;
+    atmosphere.applyForce(quad1);
+    quad1.force += propulsion.force;
     quad1.update();
     quad1.draw();
 }

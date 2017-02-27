@@ -5,13 +5,19 @@ function Quadcopter(){
     this.velocity_mps = createVector(0,0); // In meters per second
     this.acceleration_mpss = createVector(0,0); // In meters per second per second.
     
+    // Rotational States
+    this.omega = 0; // Radians per second
+    this.alpha = 0; // Radians per second^2
+
     //Physical Properties
-    this.mass_kg = 100; //kg
+    this.mass_kg = 100; // kg
+    this.moment_of_inertia = 10; // kg meters^2
     this.maxThrust_newtons = 5000; // Newtons of force.
 
     //NextState
     this.netForce_newtons = createVector(0, 0); // Initial net force.
     this.thrust_newtons = createVector(0,0); //Initial applied thrust.
+    this.netTorque = 0;  // newton meters
 
     // Control System
     this.autopilotActive = true;
@@ -47,6 +53,7 @@ Quadcopter.prototype.draw = function(){
         pop()
     }
 }//draw()
+Quadcopter.prototype.
 Quadcopter.prototype.update = function(){
     /*  Propogates forces into accelerations, velocities,
      *  and ultimately, pixel positions.
